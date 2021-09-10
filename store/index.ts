@@ -1,9 +1,9 @@
 import { getAccessorType } from 'typed-vuex';
 
-import * as dialogs from '~/store/dialog';
+import * as dialog from '~/store/dialog';
 
 export const accessorType = getAccessorType({
   modules: {
-    dialogs
+    dialog
   }
 });

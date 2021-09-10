@@ -85,7 +85,7 @@
     >
       <span>&copy; {{ new Date().getFullYear() }}</span>
     </v-footer>
-    <component v-for="(dialog, index) in $accessor.dialog.getDialogs" :is="dialog.component" v-bind="dialog.request" :key="index"></component>
+    <component v-for="(dialog, name) in $accessor.dialog.getDialogs" :is="dialog.component" v-bind="dialog.request" :key="name"></component>
   </v-app>
 </template>
 

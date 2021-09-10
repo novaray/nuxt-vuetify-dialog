@@ -1,15 +1,15 @@
 import {NuxtAppOptions, Plugin} from '@nuxt/types';
-import {Dialog, ShowDialogRequest} from '~/store/dialog';
+import {ShowDialogRequest} from '~/store/dialog';
 
 const openDialogWaitResponse = (app: NuxtAppOptions, dialogRequest: ShowDialogRequest): Promise<any> => {
-  let dialogName = '';
-  return Promise.resolve(app.$accessor.dialog.importDialog(dialogRequest)).then((result: Dialog) => {
-    dialogName = result.dialogName;
+  let requestDialogName = '';
+  return Promise.resolve(app.$accessor.dialog.importDialog(dialogRequest)).then((dialogName: string) => {
     return new Promise(resolve => {
-      resolve(result.response);
+      requestDialogName = dialogName;
+      resolve(app.$accessor.dialog.dialogs[dialogName].response);
     })
   }).then((result: any) => {
-    app.$accessor.dialog.deleteDialog(dialogName);
+    app.$accessor.dialog.deleteDialog(requestDialogName);
     return result;
   });
 }

@@ -44,10 +44,9 @@ export default defineComponent({
     str2: String
   },
   setup() {
-    const { visible, store } = dialogSetting();
+    const { visible } = dialogSetting();
     return {
       visible,
-      store
     };
   },
   methods: {

@@ -13,7 +13,6 @@ export interface DialogResponse {
 }
 
 export interface Dialog {
-  readonly dialogName: string,
   component: () => void,
   request: any,
   response: Promise<any> | null,
@@ -21,26 +20,32 @@ export interface Dialog {
 }
 
 export interface State {
-  dialogs: Array<Dialog>
+  dialogs: {
+    [dialogName: string]: Dialog
+  }
 }
 
 export const state = ():State => ({
-  dialogs: []
+  dialogs: {}
 });
 
 export const getters = getterTree(state, {
   getDialogs: (state: State) => state.dialogs
 });
 
+interface payloadDialogRequest {
+  [dialogName: string]: Dialog
+}
+
 export const mutations = mutationTree(state, {
-  openDialog(state: State, payload: Dialog) {
-    state.dialogs.push(payload);
+  openDialog(state: State, dialog: payloadDialogRequest) {
+    state.dialogs = { ...state.dialogs, ...dialog}
   },
   deleteDialog(state: State, dialogName: string) {
-    state.dialogs = state.dialogs.filter(t => t.dialogName !== dialogName);
+    delete state.dialogs[dialogName];
   },
   resolveResponse(state: State, payload: DialogResponse) {
-    const dialog = state.dialogs.find(t => t.dialogName === payload.dialogName);
+    const dialog = state.dialogs[payload.dialogName];
     if (dialog != null) {
       dialog.resolve(payload.response);
     }
@@ -50,13 +55,13 @@ export const mutations = mutationTree(state, {
 export const actions = actionTree(
   { state, getters, mutations },
   {
-    importDialog ({ commit }, request: ShowDialogRequest):Promise<Dialog> {
+    importDialog ({ commit }, request: ShowDialogRequest):Promise<string> {
       return new Promise((resolve) => {
         const dialogName = uuid();
         request.request = request.request ?? {};
         request.request.dialogName = dialogName;
+
         const dialog: Dialog = {
-          dialogName,
           component: request.component,
           request: request.request,
           response: null,
@@ -66,8 +71,12 @@ export const actions = actionTree(
           dialog.resolve = res;
         });
 
-        commit('openDialog', dialog);
-        resolve(dialog);
+        const dialogRequest = {
+          [dialogName]: dialog
+        };
+
+        commit('openDialog', dialogRequest);
+        resolve(dialogName);
       });
     },
   }

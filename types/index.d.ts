@@ -37,6 +37,7 @@ declare module 'vuex/types/index' {
     $dialog: {
       tempDialog: Promise<any>,
       loremDialog: Promise<any>
-    }
+    },
+    $accessor: typeof accessorType
   }
 }

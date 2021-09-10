@@ -5,8 +5,8 @@
       width="500"
       persistent
     >
-
       <v-card>
+
         <v-card-title class="text-h5 grey lighten-2">
           Privacy Policy
         </v-card-title>
@@ -44,7 +44,7 @@
 
 <script lang="ts">
 import {defineComponent} from '@nuxtjs/composition-api';
-import {dialogSetting} from '~/composables/DialogSettings'
+import {dialogDefaultPropsSetting, dialogSetting} from '~/composables/DialogSettings'
 
 export default defineComponent({
   name: 'TempDialog',
@@ -56,29 +56,30 @@ export default defineComponent({
     num1: Number,
     num2: Number
   },
-  setup() {
-    const { visible, store } = dialogSetting();
+  setup(props) {
+    const { visible, close } = dialogSetting();
+
     return {
       visible,
-      store
     };
   },
   methods: {
     close() {
       this.visible = false;
-      this.$destroy();
+      // 굳이 destroy를 안 해도 된다고 판단.
+      // v-if나 v-for를 통해서도 충분히 destroy가 될 뿐더러, destroy를 해버리면 닫힐 때 transition이 씹혀버림(setTimeout으로 조절은 좀.. 그래..)
+      // https://kr.vuejs.org/v2/api/index.html#vm-destroy
+      // https://codingexplained.com/coding/front-end/vue-js/destroying-vue-instance
+      this.$accessor.dialog.resolveResponse({
+        dialogName: this.dialogName,
+        response: {a: this.num1, b: this.num2}
+      });
     },
     openAnother() {
       this.$dialog.loremDialog({str1: 'a', str2: 'b'}).then(res => {
         console.log('lorem close', res);
       });
     },
-  },
-  destroyed() {
-    this.$accessor.dialog.resolveResponse({
-      dialogName: this.dialogName,
-      response: {a: this.num1, b: this.num2}
-    });
   }
 })
 </script>
