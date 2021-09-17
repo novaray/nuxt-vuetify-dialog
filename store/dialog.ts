@@ -1,4 +1,5 @@
 import { getterTree, mutationTree, actionTree } from 'typed-vuex';
+import Vue from 'vue';  //InstanceType 때문에 필요한 import
 
 export const DIALOG_NOT_RESPONSE = Symbol();
 
@@ -16,7 +17,8 @@ export interface Dialog {
   component: () => void,
   request: any,
   response: Promise<any> | null,
-  resolve: ((value: any) => void)
+  resolve: ((value: any) => void),
+  instance?: InstanceType<any>
 }
 
 export interface State {
@@ -30,10 +32,13 @@ export const state = ():State => ({
 });
 
 export const getters = getterTree(state, {
-  getDialogs: (state: State) => state.dialogs
+  getDialogs: (state: State) => state.dialogs,
+  getDialog: (state: State) => (dialogName: string) => {
+    return state.dialogs[dialogName];
+  }
 });
 
-interface payloadDialogRequest {
+export interface payloadDialogRequest {
   [dialogName: string]: Dialog
 }
 
@@ -43,6 +48,12 @@ export const mutations = mutationTree(state, {
   },
   deleteDialog(state: State, dialogName: string) {
     delete state.dialogs[dialogName];
+  },
+  setDialogInstance(state: State, payload: {
+    dialogName: string,
+    instance: InstanceType<any>
+  }) {
+    state.dialogs[payload.dialogName].instance = payload.instance;
   },
   resolveResponse(state: State, payload: DialogResponse) {
     const dialog = state.dialogs[payload.dialogName];
@@ -67,15 +78,15 @@ export const actions = actionTree(
           response: null,
           resolve: () => {}
         };
-        dialog.response = new Promise(res => {
-          dialog.resolve = res;
+        dialog.response = new Promise(dialogResolve => {
+          dialog.resolve = dialogResolve;
         });
 
         const dialogRequest = {
           [dialogName]: dialog
         };
 
-        commit('openDialog', dialogRequest);
+        this.app.$accessor.dialog.openDialog(dialogRequest);
         resolve(dialogName);
       });
     },

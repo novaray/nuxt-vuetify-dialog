@@ -16,6 +16,9 @@ const openDialogWaitResponse = (app: NuxtAppOptions, dialogRequest: ShowDialogRe
 
 const dialog: Plugin = ({ app }, inject) => {
   inject('dialog', {
+    getAllOpenDialog: () => {
+      return app.$accessor.dialog.getDialogs;
+    },
     tempDialog: (request: any) => new Promise(resolve => {
       const dialog = () => import('@/components/dialogs/TempDialog.vue');
       const dialogRequest: ShowDialogRequest = {

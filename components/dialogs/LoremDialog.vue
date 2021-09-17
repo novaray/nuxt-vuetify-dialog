@@ -31,7 +31,7 @@
 
 <script lang="ts">
 import { defineComponent } from '@nuxtjs/composition-api';
-import {dialogSetting} from '~/composables/DialogSettings';
+import { defaultDialogSetting } from '~/composables/DialogSettings';
 
 export default defineComponent({
   name: 'VuetiDialog',
@@ -43,28 +43,23 @@ export default defineComponent({
     str1: String,
     str2: String
   },
-  setup() {
-    const { visible } = dialogSetting();
+  setup(props) {
+    const { visible, closeAndResolveResponse } = defaultDialogSetting(props.dialogName);
     return {
       visible,
+      closeAndResolveResponse
     };
   },
   methods: {
     close() {
       this.visible = false;
-      this.$destroy();
+      this.closeAndResolveResponse({ c: 3, d: 4 });
     },
     openAnother() {
       this.$dialog.tempDialog({num1: 1, num2: 2}).then(res => {
         console.log('vueti close by LoremDialog', res);
       })
     }
-  },
-  destroyed() {
-    this.$accessor.dialog.resolveResponse({
-      dialogName: this.dialogName,
-      response: { c: 3, d: 4 }
-    });
   }
 })
 </script>

@@ -5,6 +5,7 @@ declare module 'vue/types/vue' {
   // this.$myInjectedFunction inside Vue components
   interface Vue {
     $dialog: {
+      getAllOpenDialog: () => any,
       tempDialog: (request: any) => Promise<any>,
       loremDialog: (request: any) => Promise<any>
     },
@@ -16,6 +17,7 @@ declare module '@nuxt/types' {
   // nuxtContext.app.$myInjectedFunction inside asyncData, fetch, plugins, middleware, nuxtServerInit
   interface NuxtAppOptions {
     $dialog: {
+      getAllOpenDialog: () => any,
       tempDialog: Promise<any>,
       loremDialog: Promise<any>
     },
@@ -24,6 +26,7 @@ declare module '@nuxt/types' {
   // nuxtContext.$myInjectedFunction
   interface Context {
     $dialog: {
+      getAllOpenDialog: () => any,
       tempDialog: Promise<any>,
       loremDialog: Promise<any>
     },
@@ -35,6 +38,7 @@ declare module 'vuex/types/index' {
   // this.$myInjectedFunction inside Vuex stores
   interface Store<S> {
     $dialog: {
+      getAllOpenDialog: () => any,
       tempDialog: Promise<any>,
       loremDialog: Promise<any>
     },

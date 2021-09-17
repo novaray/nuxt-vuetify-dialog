@@ -1,6 +1,6 @@
-import {ref, onMounted, useStore} from '@nuxtjs/composition-api';
+import {ref, onMounted, useStore, getCurrentInstance} from '@nuxtjs/composition-api';
 
-//타입 추론이 안 됨.. 믹스인을 해도 마찬가지로 타입추론이 안 되서 줫같음
+//타입 추론이 안 됨.. 믹스인을 해도 마찬가지로 타입추론이 안 됨.
 export const dialogDefaultPropsSetting = () => ({
   dialogName: {
     type: String,
@@ -8,21 +8,44 @@ export const dialogDefaultPropsSetting = () => ({
   }
 });
 
-export const dialogSetting = () => {
+export const defaultDialogSetting = (dialogName: string) => {
   const visible = ref(false);
+  const loading = ref(false);
   const store = useStore();
-  const close = () => {
+
+  const handleLoadingOn = () => {
+    loading.value = true;
+  }
+
+  const handleLoadingOff = () => {
+    loading.value = false;
+  }
+
+  const closeAndResolveResponse = (response: any) => {
     visible.value = false;
+    store.$accessor.dialog.resolveResponse({
+      dialogName,
+      response: response
+    });
   }
 
   onMounted(() => {
     visible.value = true;
-  });
 
-  // console.log(store.$accessor.dialog.resolveResponse());
+    const { emit } = getCurrentInstance() as NonNullable<ReturnType<typeof getCurrentInstance>>;
+    emit('switch', {
+      on: handleLoadingOn,
+      off: handleLoadingOff
+    });
+    store.$accessor.dialog.setDialogInstance({
+      dialogName,
+      instance: getCurrentInstance()
+    });
+  });
 
   return {
     visible,
-    close
+    loading,
+    closeAndResolveResponse
   };
 }
