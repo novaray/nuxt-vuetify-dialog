@@ -29,7 +29,6 @@
         <v-divider></v-divider>
 
         <v-card-actions>
-          <CloseSpecificBottomSheet></CloseSpecificBottomSheet>
           <v-btn
             color="primary"
             text
@@ -53,14 +52,10 @@
 
 <script lang="ts">
 import { defineComponent } from '@nuxtjs/composition-api';
-import { defaultDialogSetting } from '~/composables/DialogSettings'
-import CloseSpecificBottomSheet from '~/components/bottomSheets/CloseSpecificBottomSheet.vue';
+import { defaultDialogSetting } from '~/composables/dialogSettings'
 
 export default defineComponent({
   name: 'TempDialog',
-  components: {
-    CloseSpecificBottomSheet
-  },
   props: {
     dialogName: {
       type: String,
@@ -71,7 +66,6 @@ export default defineComponent({
   },
   setup(props) {
     const { visible, loading, closeAndResolveResponse } = defaultDialogSetting(props.dialogName);
-
     loading.value = true;
 
     return {
@@ -82,10 +76,6 @@ export default defineComponent({
   },
   methods: {
     close() {
-      // 굳이 destroy를 안 해도 된다고 판단.
-      // v-if나 v-for를 통해서도 충분히 destroy가 될 뿐더러, destroy를 해버리면 닫힐 때 transition이 씹혀버림(setTimeout으로 조절은 좀.. 그래..)
-      // https://kr.vuejs.org/v2/api/index.html#vm-destroy
-      // https://codingexplained.com/coding/front-end/vue-js/destroying-vue-instance
       this.closeAndResolveResponse({a: this.num1, b: this.num2});
     },
     openAnother() {

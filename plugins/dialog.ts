@@ -1,5 +1,5 @@
-import {NuxtAppOptions, Plugin} from '@nuxt/types';
-import {ShowDialogRequest} from '~/store/dialog';
+import { NuxtAppOptions, Plugin } from '@nuxt/types';
+import { DialogInfo, ShowDialogRequest } from "~/models/dialogModels";
 
 const openDialogWaitResponse = (app: NuxtAppOptions, dialogRequest: ShowDialogRequest): Promise<any> => {
   let requestDialogName = '';
@@ -14,11 +14,21 @@ const openDialogWaitResponse = (app: NuxtAppOptions, dialogRequest: ShowDialogRe
   });
 }
 
+const openDialogThenGetInstance = (app: NuxtAppOptions, dialogRequest: ShowDialogRequest): Promise<any> => {
+  return Promise.resolve(app.$accessor.dialog.importDialog(dialogRequest)).then((dialogName: string) => {
+    return new Promise(resolve => {
+      const dialogInfo: DialogInfo = {
+        name: dialogName,
+        dialog: app.$accessor.dialog.dialogs[dialogName]
+      };
+
+      resolve(dialogInfo);
+    })
+  });
+}
+
 const dialog: Plugin = ({ app }, inject) => {
   inject('dialog', {
-    getAllOpenDialog: () => {
-      return app.$accessor.dialog.getDialogs;
-    },
     tempDialog: (request: any) => new Promise(resolve => {
       const dialog = () => import('@/components/dialogs/TempDialog.vue');
       const dialogRequest: ShowDialogRequest = {
@@ -27,6 +37,17 @@ const dialog: Plugin = ({ app }, inject) => {
       }
 
       openDialogWaitResponse(app, dialogRequest).then((res: any) => {
+        resolve(res);
+      });
+    }),
+    tempDialogGetInstance: (request: any) => new Promise(resolve => {
+      const dialog = () => import('@/components/dialogs/TempDialog.vue');
+      const dialogRequest: ShowDialogRequest = {
+        component: () => dialog(),
+        request
+      }
+
+      openDialogThenGetInstance(app, dialogRequest).then((res: any) => {
         resolve(res);
       });
     }),

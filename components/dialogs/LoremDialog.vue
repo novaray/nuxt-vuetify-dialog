@@ -31,7 +31,7 @@
 
 <script lang="ts">
 import { defineComponent } from '@nuxtjs/composition-api';
-import { defaultDialogSetting } from '~/composables/DialogSettings';
+import { defaultDialogSetting } from '~/composables/dialogSettings';
 
 export default defineComponent({
   name: 'VuetiDialog',

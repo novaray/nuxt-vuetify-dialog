@@ -1,27 +1,7 @@
 import { getterTree, mutationTree, actionTree } from 'typed-vuex';
-import Vue from 'vue';  //InstanceType 때문에 필요한 import
+import { Dialog, DialogResponse, ShowDialogRequest } from "~/models/dialogModels";
 
-export const DIALOG_NOT_RESPONSE = Symbol();
-
-export interface ShowDialogRequest {
-  component: () => void,
-  request?: any
-}
-
-export interface DialogResponse {
-  dialogName: string,
-  response: any
-}
-
-export interface Dialog {
-  component: () => void,
-  request: any,
-  response: Promise<any> | null,
-  resolve: ((value: any) => void),
-  instance?: InstanceType<any>
-}
-
-export interface State {
+interface State {
   dialogs: {
     [dialogName: string]: Dialog
   }
@@ -32,10 +12,7 @@ export const state = ():State => ({
 });
 
 export const getters = getterTree(state, {
-  getDialogs: (state: State) => state.dialogs,
-  getDialog: (state: State) => (dialogName: string) => {
-    return state.dialogs[dialogName];
-  }
+  getDialogs: (state: State) => state.dialogs
 });
 
 export interface payloadDialogRequest {
@@ -51,9 +28,9 @@ export const mutations = mutationTree(state, {
   },
   setDialogInstance(state: State, payload: {
     dialogName: string,
-    instance: InstanceType<any>
+    instanceParams: InstanceType<any>
   }) {
-    state.dialogs[payload.dialogName].instance = payload.instance;
+    state.dialogs[payload.dialogName].instanceParams = payload.instanceParams;
   },
   resolveResponse(state: State, payload: DialogResponse) {
     const dialog = state.dialogs[payload.dialogName];

@@ -1,4 +1,5 @@
-import {ref, onMounted, useStore, getCurrentInstance} from '@nuxtjs/composition-api';
+import { ref, onMounted } from '@nuxtjs/composition-api';
+import { useAccessor } from "~/composables/useAccessor";
 
 //타입 추론이 안 됨.. 믹스인을 해도 마찬가지로 타입추론이 안 됨.
 export const dialogDefaultPropsSetting = () => ({
@@ -11,7 +12,7 @@ export const dialogDefaultPropsSetting = () => ({
 export const defaultDialogSetting = (dialogName: string) => {
   const visible = ref(false);
   const loading = ref(false);
-  const store = useStore();
+  const accessor = ref(useAccessor());
 
   const handleLoadingOn = () => {
     loading.value = true;
@@ -23,7 +24,7 @@ export const defaultDialogSetting = (dialogName: string) => {
 
   const closeAndResolveResponse = (response: any) => {
     visible.value = false;
-    store.$accessor.dialog.resolveResponse({
+    accessor.value.dialog.resolveResponse({
       dialogName,
       response: response
     });
@@ -32,14 +33,14 @@ export const defaultDialogSetting = (dialogName: string) => {
   onMounted(() => {
     visible.value = true;
 
-    const { emit } = getCurrentInstance() as NonNullable<ReturnType<typeof getCurrentInstance>>;
-    emit('switch', {
+    const instanceParams = {
       on: handleLoadingOn,
       off: handleLoadingOff
-    });
-    store.$accessor.dialog.setDialogInstance({
+    }
+
+    accessor.value.dialog.setDialogInstance({
       dialogName,
-      instance: getCurrentInstance()
+      instanceParams: instanceParams
     });
   });
 

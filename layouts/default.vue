@@ -86,7 +86,7 @@
       <span>&copy; {{ new Date().getFullYear() }}</span>
     </v-footer>
     <component v-for="(dialog, name) in $accessor.dialog.getDialogs" :is="dialog.component"
-               v-bind="dialog.request" :key="name" :ref="name" @switch="(param) => onAction(param)"></component>
+               v-bind="dialog.request" :key="name"></component>
   </v-app>
 </template>
 
@@ -118,14 +118,6 @@ export default {
       right: true,
       rightDrawer: false,
       title: 'Vuetify.js'
-    }
-  },
-  methods: {
-    onAction(param: any) {
-      console.log(param);
-      setTimeout(() => {
-        param.off();
-      }, 1000);
     }
   }
 }
